@@ -6,7 +6,7 @@
 FROM centos:centos6
 MAINTAINER Diego Cortassa <diego@cortassa.net>
 
-ENV REFRESHED_AT 2014-07-23
+ENV REFRESHED_AT 2015-02-25.1
 
 # Reinstall glibc-common to get deleted files (i.e. locales, encoding UTF8) from the centos docker image
 RUN yum -y reinstall glibc-common
@@ -45,15 +45,15 @@ RUN yum clean all
 RUN service postgresql initdb
 
 # get and install Tactic
-RUN curl -O http://community.southpawtech.com/sites/default/files/download/TACTIC%20-%20Enterprise/TACTIC-4.1.0.v05.zip && \
-    unzip TACTIC-4.1.0.v05.zip; rm TACTIC-4.1.0.v05.zip && \
-    cp TACTIC-4.1.0.v05/src/install/postgresql/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf && \
+RUN curl -O http://community.southpawtech.com/sites/default/files/download/TACTIC%20-%20Enterprise/TACTIC-4.3.0.v01.zip && \
+    unzip TACTIC-4.3.0.v01.zip; rm TACTIC-4.3.0.v01.zip && \
+    cp TACTIC-4.3.0.v01/src/install/postgresql/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf && \
     chown postgres:postgres /var/lib/pgsql/data/pg_hba.conf && \
     service postgresql start && \
-    yes | python TACTIC-4.1.0.v05/src/install/install.py -d && \
+    yes | python TACTIC-4.3.0.v01/src/install/install.py -d && \
     service postgresql stop && \
     cp /home/apache/tactic_data/config/tactic.conf /etc/httpd/conf.d/ && \
-    rm -r TACTIC-4.1.0.v05
+    rm -r TACTIC-4.3.0.v01
 
 EXPOSE 80 22
 
