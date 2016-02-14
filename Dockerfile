@@ -6,7 +6,7 @@
 FROM centos:centos6
 MAINTAINER Diego Cortassa <diego@cortassa.net>
 
-ENV REFRESHED_AT 2016-01-19
+ENV REFRESHED_AT 2016-02-14
 
 # Reinstall glibc-common to get deleted files (i.e. locales, encoding UTF8) from the centos docker image
 #RUN yum -y reinstall glibc-common
@@ -22,7 +22,7 @@ ENV HOME /root
 RUN echo 'export PS1="[\u@docker] \W # "' >> /root/.bash_profile
 
 # Install dependecies
-RUN yum -y install httpd postgresql postgresql-server postgresql-contrib python-lxml python-imaging python-crypto python-psycopg2 unzip ImageMagick
+RUN yum -y install httpd postgresql postgresql-server postgresql-contrib python-lxml python-imaging python-crypto python-psycopg2 unzip git ImageMagick
 # TODO add ffmpeg
 
 # install supervisord
@@ -49,15 +49,14 @@ RUN yum clean all
 RUN service postgresql initdb
 
 # get and install Tactic
-RUN curl -O http://community.southpawtech.com/sites/default/files/download/TACTIC%20-%20Enterprise/TACTIC-4.3.0.v02.zip && \
-    unzip TACTIC-4.3.0.v02.zip >/dev/null ; rm TACTIC-4.3.0.v02.zip && \
-    cp TACTIC-4.3.0.v02/src/install/postgresql/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf && \
+RUN git clone -b 4.4 https://github.com/Southpaw-TACTIC/TACTIC.git && \
+    cp TACTIC/src/install/postgresql/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf && \
     chown postgres:postgres /var/lib/pgsql/data/pg_hba.conf && \
     service postgresql start && \
-    yes | python TACTIC-4.3.0.v02/src/install/install.py -d && \
+    yes | python TACTIC/src/install/install.py -d && \
     service postgresql stop && \
     cp /home/apache/tactic_data/config/tactic.conf /etc/httpd/conf.d/ && \
-    rm -r TACTIC-4.3.0.v02
+    rm -r TACTIC
 
 EXPOSE 80 22
 
