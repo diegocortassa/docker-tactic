@@ -6,7 +6,7 @@
 FROM centos:centos6
 MAINTAINER Diego Cortassa <diego@cortassa.net>
 
-ENV REFRESHED_AT 2016-04-14
+ENV REFRESHED_AT 2016-10-23
 
 # Reinstall glibc-common to get deleted files (i.e. locales, encoding UTF8) from the centos docker image
 #RUN yum -y reinstall glibc-common
@@ -48,7 +48,7 @@ RUN yum clean all
 RUN service postgresql initdb
 
 # get and install Tactic
-RUN git clone -b 4.5 https://github.com/Southpaw-TACTIC/TACTIC.git && \
+RUN git clone -b 4.5 --depth 1 https://github.com/Southpaw-TACTIC/TACTIC.git && \
     cp TACTIC/src/install/postgresql/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf && \
     chown postgres:postgres /var/lib/pgsql/data/pg_hba.conf && \
     service postgresql start && \
