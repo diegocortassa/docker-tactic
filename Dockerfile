@@ -6,7 +6,7 @@
 FROM centos:centos6
 MAINTAINER Diego Cortassa <diego@cortassa.net>
 
-ENV REFRESHED_AT 2016-02-14
+ENV REFRESHED_AT 2016-04-14
 
 # Reinstall glibc-common to get deleted files (i.e. locales, encoding UTF8) from the centos docker image
 #RUN yum -y reinstall glibc-common
@@ -34,13 +34,12 @@ RUN /bin/rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release
 ADD supervisord.conf /etc/supervisor/supervisord.conf
 
 # Ssh server
-# install ssh
 # start and stop the server to make it generate host keys
 RUN yum -y install openssh-server && \
     service sshd start && \
     service sshd stop
 # set root passord at image launch with -e ROOT_PASSWORD=my_secure_password
-ADD setup.sh /usr/local/bin/setup.sh
+ADD bootstrap.sh /usr/local/bin/bootstrap.sh
 
 # Clean up
 RUN yum clean all
@@ -61,4 +60,4 @@ RUN git clone -b 4.4 https://github.com/Southpaw-TACTIC/TACTIC.git && \
 EXPOSE 80 22
 
 # Start Tactic stack
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+CMD ["/usr/local/bin/bootstrap.sh"]
