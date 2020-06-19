@@ -6,7 +6,7 @@
 FROM centos:centos8
 MAINTAINER Diego Cortassa <diego@cortassa.net>
 
-ENV REFRESHED_AT 2020-06-19
+ENV REFRESHED_AT 2020-06-20
 
 # Install locale not included in centos docker image
 RUN dnf -y install glibc-langpack-en
@@ -54,7 +54,7 @@ RUN git clone -b 4.7 --depth 1 https://github.com/Southpaw-TACTIC/TACTIC.git && 
     sed -i -e 's|/home/apache|/opt/tactic|g' TACTIC/src/install/install.py && \
     yes | python3 TACTIC/src/install/install.py -d && \
     chown -R apache:apache /opt/tactic && \
-    sed -i -e 's|<python>python</python>|<python>python3</python>' /opt/tactic/tactic_data/config/tactic-conf.xml
+    sed -i -e 's|<python>python</python>|<python>python3</python>|' /opt/tactic/tactic_data/config/tactic-conf.xml && \
     cp /opt/tactic/tactic_data/config/tactic.conf /etc/httpd/conf.d/ && \
     pkill postgres && \
     rm -rf TACTIC
