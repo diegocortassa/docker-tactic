@@ -3,61 +3,69 @@
 # Based on Centos 6 image
 ############################################################
 
-FROM centos:centos6
+FROM centos:centos8
 MAINTAINER Diego Cortassa <diego@cortassa.net>
 
-ENV REFRESHED_AT 2016-10-23
+ENV REFRESHED_AT 2020-06-19
 
-# Reinstall glibc-common to get deleted files (i.e. locales, encoding UTF8) from the centos docker image
-#RUN yum -y reinstall glibc-common
-RUN yum -y update glibc-common
+# Install locale not included in centos docker image
+RUN dnf -y install glibc-langpack-en
+RUN dnf -y update && dnf clean all
 
 # Setup a minimal env
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+# ENV LC_ALL en_US.UTF-8
 ENV HOME /root
 
 # set a better shell prompt
 RUN echo 'export PS1="[\u@docker] \W # "' >> /root/.bash_profile
 
 # Install dependecies
-RUN yum -y install httpd postgresql postgresql-server postgresql-contrib python-lxml python-imaging python-crypto python-psycopg2 unzip git ImageMagick
-# TODO add ffmpeg
+RUN dnf -y install epel-release
+RUN dnf -y install httpd postgresql postgresql-server openssh-server python38 unzip git ImageMagick
+run pip3 install psycopg2-binary pillow lxml pycryptodomex six pytz jaraco.functools requests supervisor
 
-# install supervisord
-RUN /bin/rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm && \
-    yum -y install python-setuptools && \
-    easy_install supervisor && \
-    mkdir -p /var/log/supervisor && \ 
-    mkdir -p /etc/supervisor/conf.d/
-ADD supervisord.conf /etc/supervisor/supervisord.conf
+# add ffmpeg
+RUN curl -L -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz && \
+    tar xf ffmpeg-release-amd64-static.tar.xz && \
+    cp ffmpeg-*-static/ffmpeg ffmpeg-*-static/ffprobe ffmpeg-*-static/qt-faststart /usr/local/bin/ && \
+    rm -rf ffmpeg-*-static*
 
-# Ssh server
-# start and stop the server to make it generate host keys
-RUN yum -y install openssh-server && \
-    service sshd start && \
-    service sshd stop
+# generate host keys for sshd server
+RUN /usr/bin/ssh-keygen -A
+
 # set root passord at image launch with -e ROOT_PASSWORD=my_secure_password
 ADD bootstrap.sh /usr/local/bin/bootstrap.sh
 
 # Clean up
-RUN yum clean all
+RUN dnf clean all
 
 # initialize postgresql data files
-RUN service postgresql initdb
+#RUN postgresql-setup initdb
+RUN su - postgres -c "/usr/bin/initdb -D /var/lib/pgsql/data"
 
 # get and install Tactic
-RUN git clone -b 4.5 --depth 1 https://github.com/Southpaw-TACTIC/TACTIC.git && \
+RUN git clone -b 4.7 --depth 1 https://github.com/Southpaw-TACTIC/TACTIC.git && \
     cp TACTIC/src/install/postgresql/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf && \
     chown postgres:postgres /var/lib/pgsql/data/pg_hba.conf && \
-    service postgresql start && \
-    yes | python TACTIC/src/install/install.py -d && \
-    service postgresql stop && \
-    cp /home/apache/tactic_data/config/tactic.conf /etc/httpd/conf.d/ && \
-    rm -r TACTIC
+    su postgres -c "postgres -p 5432 -D /var/lib/pgsql/data &" && \
+    sleep 5 && \
+    sed -i -e 's|/home/apache|/opt/tactic|g' TACTIC/src/install/install.py && \
+    yes | python3 TACTIC/src/install/install.py -d && \
+    chown -R apache:apache /opt/tactic && \
+    sed -i -e 's|<python>python</python>|<python>python3</python>' /opt/tactic/tactic_data/config/tactic-conf.xml
+    cp /opt/tactic/tactic_data/config/tactic.conf /etc/httpd/conf.d/ && \
+    pkill postgres && \
+    rm -rf TACTIC
 
 EXPOSE 80 22
 
+# configure supervisord
+RUN mkdir -p /var/log/supervisor && \
+    mkdir -p /etc/supervisor/conf.d/
+ADD supervisord.conf /etc/supervisor/supervisord.conf
+
 # Start Tactic stack
 CMD ["/usr/local/bin/bootstrap.sh"]
+
