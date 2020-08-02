@@ -1,12 +1,12 @@
 ############################################################
 # Dockerfile to run Tactic Containers 
-# Based on Centos 6 image
+# Based on Centos 8 image
 ############################################################
 
 FROM centos:centos8
 MAINTAINER Diego Cortassa <diego@cortassa.net>
 
-ENV REFRESHED_AT 2020-06-20
+ENV REFRESHED_AT 2020-08-02
 
 # Install locale not included in centos docker image
 RUN dnf -y install glibc-langpack-en
@@ -46,7 +46,7 @@ RUN dnf clean all
 RUN su - postgres -c "/usr/bin/initdb -D /var/lib/pgsql/data"
 
 # get and install Tactic
-RUN git clone -b 4.7 --depth 1 https://github.com/Southpaw-TACTIC/TACTIC.git && \
+RUN git clone -b 4.8 --depth 1 https://github.com/Southpaw-TACTIC/TACTIC.git && \
     cp TACTIC/src/install/postgresql/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf && \
     chown postgres:postgres /var/lib/pgsql/data/pg_hba.conf && \
     su postgres -c "postgres -p 5432 -D /var/lib/pgsql/data &" && \
