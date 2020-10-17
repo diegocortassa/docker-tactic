@@ -22,9 +22,10 @@ Download image with:
 
 Run the container with:
 
-    $ docker run -d -p 80:80 -p 2222:22 -e ROOT_PASSWORD="my_secure_root_password" diegocortassa/tactic
-    (remember to set ROOT_PASSWORD)
+    $ docker run -d --name tactic --volume=/tactic-docker/tactic:/opt/tactic --volume=/tactic-docker/postgres-data:/var/lib/pgsql/data -p 80:80 diegocortassa/tactic
+
+/opt/tactic contains tactic config and data
+/var/lib/pgsql/data contains the postgres database
 
 - connect with your browser to http://localhost to use tactic.
-- use "ssh root@localhost -p 2222" for shell access.
 
