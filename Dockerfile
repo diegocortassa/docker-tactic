@@ -6,7 +6,7 @@
 FROM centos:centos8
 MAINTAINER Diego Cortassa <diego@cortassa.net>
 
-ENV REFRESHED_AT 2020-11-26
+ENV REFRESHED_AT 2021-03-29
 
 # Install locale (not included in centos docker image)
 RUN dnf -y install glibc-langpack-*
