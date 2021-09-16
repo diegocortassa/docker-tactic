@@ -18,7 +18,7 @@ On a recent ubuntu just use "sudo apt-get update; sudo apt-get install docker.io
 
 Download image with:
 
-    $ docker docker pull diegocortassa/tactic
+    $ docker pull diegocortassa/tactic
 
 Run the container with:
 
