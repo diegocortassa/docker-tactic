@@ -3,7 +3,7 @@
 # Based on Centos 8 image
 ############################################################
 
-FROM centos:centos8
+FROM rockylinux:8
 MAINTAINER Diego Cortassa <diego@cortassa.net>
 
 ENV REFRESHED_AT 2021-03-29
