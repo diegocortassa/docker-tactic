@@ -33,6 +33,7 @@ RUN dnf -y install \
     postgresql-server \
     python38 \
     unzip \
+    xz \
     git-core \
     ImageMagick && \
     dnf clean all
