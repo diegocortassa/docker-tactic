@@ -35,8 +35,10 @@ RUN dnf -y install \
     unzip \
     xz \
     git-core \
-    ImageMagick && \
-    dnf clean all
+    ImageMagick
+
+# Needed to build python-ldap
+RUN dnf -y install gcc python39-devel openldap-devel
 
 RUN pip3 install \
     psycopg2-binary \
@@ -47,7 +49,21 @@ RUN pip3 install \
     pytz \
     jaraco.functools \
     requests \
+    python-ldap \
     supervisor
+
+# remove unneeded packages
+RUN dnf -y remove \
+    cpp \
+    cyrus-sasl \
+    cyrus-sasl-devel \
+    glibc-devel \
+    glibc-headers \
+    isl \
+    kernel-headers \
+    libmpc \
+    libxcrypt-devel && \
+    dnf clean all
 
 # add ffmpeg
 RUN curl -L -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz && \
