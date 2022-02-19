@@ -75,7 +75,7 @@ RUN curl -L -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-st
 RUN git clone -b 4.8 --depth 1 https://github.com/Southpaw-TACTIC/TACTIC.git
 RUN cp TACTIC/src/install/apache/tactic.conf /etc/httpd/conf.d/
 
-EXPOSE 80 22
+EXPOSE 80
 
 # configure supervisord
 RUN mkdir -p /var/log/supervisor && \
