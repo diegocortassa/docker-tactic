@@ -1,6 +1,6 @@
 ############################################################
 # Dockerfile to run a Tactic Container
-# Based on Centos 8 image
+# Based on Rocky Linux 8 image
 ############################################################
 
 FROM rockylinux:8
