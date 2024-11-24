@@ -22,8 +22,7 @@ if [[ ! -e "/opt/tactic/tactic/VERSION" ]]; then
     su - postgres -c "pg_ctl -w -D /var/lib/pgsql/data stop"
     echo "*** Tactic Docker First Run: tactic installed"
 else
-
-   # If the docker image version was update reinstall tactic and update db
+   # If the docker image version was updated reinstall tactic and update db
    INTALLED_VERSION=$(cat /opt/tactic/tactic/VERSION)
    IMAGE_VERSION=$(cat TACTIC/VERSION)
    if [[ "$INTALLED_VERSION" !=  "$IMAGE_VERSION" ]] ; then
@@ -39,7 +38,7 @@ else
        su - postgres -c "pg_ctl -w -D /var/lib/pgsql/data stop"
    fi
 
-    # 
+    #
     PY3_LIB=`/usr/bin/python3 -c 'from distutils.sysconfig import get_python_lib; import sys; sys.stdout.write(get_python_lib())'`
     TACTIC_ENV_DIR="$PY3_LIB/tacticenv"
     mkdir -p "$TACTIC_ENV_DIR"
